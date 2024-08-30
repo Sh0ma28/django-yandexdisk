@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Скачать с Яндекс диска</title>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="public_key">Введите ссылку:</label>
+        <input type="text" name="public_key">
+        <button type="submit">Открыть</button>
+    </form>
+
+    {% if data %}
+        <h1> {{ name }}</h1>
+        {% if path %}
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="public_key" value="{{ public_key }}">
+            <button type="submit">В корень</button>
+        </form>
+        {% endif %}
+        <ul>
+            {% for item in data %}
+                <li>
+                    {{ item.name }}
+                    {% if item.type == 'dir'%}
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="public_key" value="{{ public_key }}">
+                            <input type="hidden" name="path" value="{{ item.path }}">
+                            <button type="submit">Перейти</button>
+                        </form>
+                    {% endif %}
+                    {% if item.file %}
+                            <a href="{{ item.file }}" download>Скачать</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
