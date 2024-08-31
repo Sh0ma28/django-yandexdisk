@@ -3,6 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Скачать с Яндекс диска</title>
+    <style>
+        .list {
+            padding: 10px;
+            display: none;
+        }
+
+        #checkbox_dir:checked ~ #dir {
+            display: block;
+        }
+
+        #checkbox_image:checked ~ #image {
+            display: block;
+        }
+
+        #checkbox_document:checked ~ #document {
+            display: block;
+        }
+
+        #checkbox_other:checked ~ #other {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <form method="POST">
@@ -14,6 +36,10 @@
 
     {% if data %}
         <h1> {{ name }}</h1>
+        <input type="checkbox" class="checkbox" id="checkbox_dir" checked>Показать папки
+        <input type="checkbox" class="checkbox" id="checkbox_image" checked>Показать картинки
+        <input type="checkbox" class="checkbox" id="checkbox_document" checked>Показать документы
+        <input type="checkbox" class="checkbox" id="checkbox_other" checked>Показать остальное
         {% if path %}
         <form method="POST">
             {% csrf_token %}
@@ -21,24 +47,65 @@
             <button type="submit">В корень</button>
         </form>
         {% endif %}
-        <ul>
-            {% for item in data %}
-                <li>
-                    {{ item.name }}
-                    {% if item.type == 'dir'%}
-                        <form method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="public_key" value="{{ public_key }}">
-                            <input type="hidden" name="path" value="{{ item.path }}">
-                            <button type="submit">Перейти</button>
-                        </form>
-                    {% endif %}
-                    {% if item.file %}
+        {% if data.dir.length != 0 %}
+            <div class="list" id="dir">
+                <ul>
+                    {% for item in data.dir %}
+                        <li>
+                            {{ item.name }}
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="public_key" value="{{ public_key }}">
+                                <input type="hidden" name="path" value="{{ item.path }}">
+                                <button type="submit">Перейти</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if data.image.length != 0 %}
+            <div class="list" id="image">
+                <ul>
+                    {% for item in data.image %}
+                        <li>
+                            {{ item.name }}
+                            {% if item.file %}
                             <a href="{{ item.file }}" download>Скачать</a>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if data.document.length != 0 %}
+            <div class="list" id="document">
+                <ul>
+                    {% for item in data.document %}
+                        <li>
+                            {{ item.name }}
+                            {% if item.file %}
+                                <a href="{{ item.file }}" download>Скачать</a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if data.other.length != 0 %}
+            <div class="list" id="other">
+                <ul>
+                    {% for item in data.other %}
+                        <li>
+                            {{ item.name }}
+                            {% if item.file %}
+                                <a href="{{ item.file }}" download>Скачать</a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
     {% endif %}
 </body>
 </html>
