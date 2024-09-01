@@ -10,102 +10,111 @@
     <script>
         function func() {
             var val = document.getElementById("select").value
-            let lists = document.getElementsByClassName("list")
-            console.log(lists)
-
-            for (let i = 0; i < lists.length; i++) {
-                if (lists[i].id == "list-" + val) {
-                    lists[i].style.display = "block"
+            let dirs = document.getElementsByClassName("dir")
+            let images = document.getElementsByClassName("image")
+            let docs = document.getElementsByClassName("document")
+            let others = document.getElementsByClassName("other")
+            let list = [...dirs, ...images, ...docs, ...others]
+            for (let i = 0; i < list.length; i++) {
+                if (list[i].className == val) {
+                    list[i].style.display = "block"
                 }
                 else {
-                    lists[i].style.display = "none"
+                    list[i].style.display = "none"
                 }
             }
         }
     </script>
     <form method="POST">
         {% csrf_token %}
-        <label for="public_key">Введите ссылку:</label>
-        <input type="text" name="public_key">
-        <button type="submit">Открыть</button>
+        <div class="input-group p-5 my-5 text-center">
+            <input type="text" name="public_key" class="form-control rounded w-30" placeholder="Введите ссылку на Яндекс диск" aria-label="Search" aria-describedby="search-addon" />
+            <button type="submit" class="btn btn-outline-primary" data-mdb-ripple-init>Открыть</button>
+        </div>
     </form>
 
     {% if data %}
-    
-        <h1> {{ name }}</h1>
-        {% if path %}
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="public_key" value="{{ public_key }}">
-            <button type="submit">В корень</button>
-        </form>
-        {% endif %}
-        <select id="select" onchange="func()">
-            <option value="dir">Папки</option>
-            <option value="image">Картинки</option>
-            <option value="document">Документы</option>
-            <option value="other">Другое</option>
-        </select>
-        <div class="container">
-        {% if data.dir.length != 0 %}
-            <div class="list" id="list-dir">
-                <ul>
-                    {% for item in data.dir %}
-                        <li>
-                            {{ item.name }}
-                            <form method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="public_key" value="{{ public_key }}">
-                                <input type="hidden" name="path" value="{{ item.path }}">
-                                <button type="submit">Перейти</button>
-                            </form>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        {% if data.image.length != 0 %}
-            <div class="list" id="list-image">
-                <ul>
-                    {% for item in data.image %}
-                        <li>
-                            {{ item.name }}
-                            {% if item.file %}
-                            <a href="{{ item.file }}" download>Скачать</a>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        {% if data.document.length != 0 %}
-            <div class="list" id="list-document">
-                <ul>
-                    {% for item in data.document %}
-                        <li>
-                            {{ item.name }}
-                            {% if item.file %}
-                                <a href="{{ item.file }}" download>Скачать</a>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        {% if data.other.length != 0 %}
-            <div class="list" id="list-other">
-                <ul>
-                    {% for item in data.other %}
-                        <li>
-                            {{ item.name }}
-                            {% if item.file %}
-                                <a href="{{ item.file }}" download>Скачать</a>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+        <h1 class="display-5 fw-bold text-body-emphasis text-center"> {{ name }}</h1>
+        <div class="container justify-content-center align-items-center w-100 p-4 py-md-2 ">
+            <select class="form-select" id="select" onchange="func()">
+                <option value="dir">Папки</option>
+                <option value="image">Картинки</option>
+                <option value="document">Документы</option>
+                <option value="other">Другое</option>
+            </select>
+        </div>
+        <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
+            <div class="list-group w-100">
+            {% if path %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="public_key" value="{{ public_key }}">
+                    <button class="btn btn-outline-primary my-3" type="submit">В корень</button>
+                </form>
+            {% endif %} 
+            {% for item in data %}
+                {% if item.type == 'dir' %}
+                    <div class="dir">
+                        <div class="list-group-item list-group-item-action d-flex gap-3 py-3">
+                            <img src="https://www.svgrepo.com/show/513476/folder.svg" alt="folder" width="32" height="32" class="flex-shrink-0">
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0">{{ item.name }}</h6>
+                                </div>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="public_key" value="{{ public_key }}">
+                                    <input type="hidden" name="path" value="{{ item.path }}">
+                                    <button type="submit" class="btn btn-outline-primary text-nowrap">Перейти</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if item.media_type == 'image' %}
+                    <div class="image">
+                        <div class="list-group-item list-group-item-action d-flex gap-3 py-3">
+                            <img src="https://www.svgrepo.com/show/513470/photo.svg" alt="image" width="32" height="32" class="flex-shrink-0">
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0">{{ item.name }}</h6>
+                                    <p class="mb-0 opacity-75">{{ item.size }} bytes</p>
+                                </div>
+                                <a href="{{ item.file }}" class="text-nowrap" download>Скачать</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if item.media_type == 'document' %}
+                    <div class="document">
+                        <div class="list-group-item list-group-item-action d-flex gap-3 py-3">
+                            <img src="https://www.svgrepo.com/show/513532/file-2.svg" alt="document" width="32" height="32" class="flex-shrink-0">
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0">{{ item.name }}</h6>
+                                    <p class="mb-0 opacity-75">{{ item.size }} bytes</p>
+                                </div>
+                                <a href="{{ item.file }}" class="text-nowrap" download>Скачать</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if item.media_type == 'other' %}
+                    <div class="other">
+                        <div class="list-group-item list-group-item-action d-flex gap-3 py-3">
+                            <img src="https://www.svgrepo.com/show/513565/cog.svg" alt="other" width="32" height="32" class="flex-shrink-0">
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0">{{ item.name }}</h6>
+                                    <p class="mb-0 opacity-75">{{ item.size }} bytes</p>
+                                </div>
+                                <a href="{{ item.file }}" class="text-nowrap" download>Скачать</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 </body>
