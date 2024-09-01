@@ -3,30 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Скачать с Яндекс диска</title>
-    <style>
-        .list {
-            padding: 10px;
-            display: none;
-        }
-
-        #checkbox_dir:checked ~ #dir {
-            display: block;
-        }
-
-        #checkbox_image:checked ~ #image {
-            display: block;
-        }
-
-        #checkbox_document:checked ~ #document {
-            display: block;
-        }
-
-        #checkbox_other:checked ~ #other {
-            display: block;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        function func() {
+            var val = document.getElementById("select").value
+            let lists = document.getElementsByClassName("list")
+            console.log(lists)
+
+            for (let i = 0; i < lists.length; i++) {
+                if (lists[i].id == "list-" + val) {
+                    lists[i].style.display = "block"
+                }
+                else {
+                    lists[i].style.display = "none"
+                }
+            }
+        }
+    </script>
     <form method="POST">
         {% csrf_token %}
         <label for="public_key">Введите ссылку:</label>
@@ -35,11 +31,8 @@
     </form>
 
     {% if data %}
+    
         <h1> {{ name }}</h1>
-        <input type="checkbox" class="checkbox" id="checkbox_dir" checked>Показать папки
-        <input type="checkbox" class="checkbox" id="checkbox_image" checked>Показать картинки
-        <input type="checkbox" class="checkbox" id="checkbox_document" checked>Показать документы
-        <input type="checkbox" class="checkbox" id="checkbox_other" checked>Показать остальное
         {% if path %}
         <form method="POST">
             {% csrf_token %}
@@ -47,8 +40,15 @@
             <button type="submit">В корень</button>
         </form>
         {% endif %}
+        <select id="select" onchange="func()">
+            <option value="dir">Папки</option>
+            <option value="image">Картинки</option>
+            <option value="document">Документы</option>
+            <option value="other">Другое</option>
+        </select>
+        <div class="container">
         {% if data.dir.length != 0 %}
-            <div class="list" id="dir">
+            <div class="list" id="list-dir">
                 <ul>
                     {% for item in data.dir %}
                         <li>
@@ -65,7 +65,7 @@
             </div>
         {% endif %}
         {% if data.image.length != 0 %}
-            <div class="list" id="image">
+            <div class="list" id="list-image">
                 <ul>
                     {% for item in data.image %}
                         <li>
@@ -79,7 +79,7 @@
             </div>
         {% endif %}
         {% if data.document.length != 0 %}
-            <div class="list" id="document">
+            <div class="list" id="list-document">
                 <ul>
                     {% for item in data.document %}
                         <li>
@@ -93,7 +93,7 @@
             </div>
         {% endif %}
         {% if data.other.length != 0 %}
-            <div class="list" id="other">
+            <div class="list" id="list-other">
                 <ul>
                     {% for item in data.other %}
                         <li>
@@ -106,6 +106,7 @@
                 </ul>
             </div>
         {% endif %}
+    </div>
     {% endif %}
 </body>
 </html>
