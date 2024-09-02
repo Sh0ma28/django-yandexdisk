@@ -16,7 +16,10 @@
             let others = document.getElementsByClassName("other")
             let list = [...dirs, ...images, ...docs, ...others]
             for (let i = 0; i < list.length; i++) {
-                if (list[i].className == val) {
+                if (val == "all") {
+                    list[i].style.display = "block"
+                }
+                else if (list[i].className == val) {
                     list[i].style.display = "block"
                 }
                 else {
@@ -37,6 +40,7 @@
         <h1 class="display-5 fw-bold text-body-emphasis text-center"> {{ name }}</h1>
         <div class="container justify-content-center align-items-center w-100 p-4 py-md-2 ">
             <select class="form-select" id="select" onchange="func()">
+                <option value="all">Все</option>
                 <option value="dir">Папки</option>
                 <option value="image">Картинки</option>
                 <option value="document">Документы</option>
